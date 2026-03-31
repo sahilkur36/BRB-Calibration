@@ -994,6 +994,7 @@ def main() -> None:
                     debug_partition=DEBUG_PARTITION,
                     use_amplitude_weights=use_amp_w,
                 )
+                n_cycles = len(amp_meta)
                 bd_local = _bounds_for_active(active)
                 (
                     out_row,
