@@ -67,17 +67,21 @@ STEEL_DEFAULT: dict[str, float] = {
     "b_n": 0.025,
 }
 
-B_STAT_NAMES: frozenset[str] = frozenset({"median", "mean", "q1", "q3", "min", "max"})
+B_STAT_NAMES: frozenset[str] = frozenset(
+    {"median", "mean", "weighted_mean", "q1", "q3", "min", "max"}
+)
 
 _BN_BP_STAT_COLUMNS: tuple[str, ...] = (
     "b_p_mean",
     "b_p_median",
+    "b_p_weighted_mean",
     "b_p_q1",
     "b_p_q3",
     "b_p_min",
     "b_p_max",
     "b_n_mean",
     "b_n_median",
+    "b_n_weighted_mean",
     "b_n_q1",
     "b_n_q3",
     "b_n_min",
@@ -197,6 +201,7 @@ def _resolve_b_arm(row: pd.Series, *, arm: str, spec: float | str) -> float:
 
     med = _get_bn_col(row, f"b_{arm}_median")
     mean = _get_bn_col(row, f"b_{arm}_mean")
+    wmean = _get_bn_col(row, f"b_{arm}_weighted_mean")
     q1 = _get_bn_col(row, f"b_{arm}_q1")
     q3 = _get_bn_col(row, f"b_{arm}_q3")
     vmin = _get_bn_col(row, f"b_{arm}_min")
@@ -213,6 +218,14 @@ def _resolve_b_arm(row: pd.Series, *, arm: str, spec: float | str) -> float:
     if stat == "mean":
         if _finite_scalar(mean):
             return float(mean)
+        return dflt
+    if stat == "weighted_mean":
+        if _finite_scalar(wmean):
+            return float(wmean)
+        if _finite_scalar(mean):
+            return float(mean)
+        if _finite_scalar(med):
+            return float(med)
         return dflt
     if stat == "q1":
         if _finite_scalar(q1):

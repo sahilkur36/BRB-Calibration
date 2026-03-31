@@ -116,7 +116,7 @@ def plot_one_specimen(specimen_id: str, catalog_row: pd.Series, out_dir: Path) -
         result = _segment_line_data(u, F, start_idx, end_idx, E_hat, A_sc, L_T, fy, L_y)
         if result is None:
             continue
-        b, u_line, F_line, is_tension = result
+        b, u_line, F_line, is_tension, _amp = result
         peak_def = float(u_line[-1])
         keep, last_tension_peak, last_compression_peak = _segment_peak_ok(
             peak_def, is_tension, last_tension_peak, last_compression_peak

@@ -73,7 +73,6 @@ from calibrate.plot_params_vs_filtered import (  # noqa: E402
     plot_force_def_digitized_unordered_overlays,
     plot_force_def_overlays,
     plot_unordered_binned_cloud_envelopes,
-    plot_unordered_nearest_proximity_map,
 )
 from calibrate.averaged_params_lib import (  # noqa: E402
     compute_weighted_averaged_param_dict,
@@ -440,16 +439,6 @@ def main() -> None:
                 line(f"{sid} set {set_id}: cloud plot arrays failed: {exc}")
             else:
                 try:
-                    plot_unordered_nearest_proximity_map(
-                        sid,
-                        set_id,
-                        exp_plot_xy,
-                        num_plot_xy,
-                        out_dir=plots_dir_ordered,
-                    )
-                except Exception as exc:
-                    line(f"{sid} set {set_id}: nearest proximity plotting failed: {exc}")
-                try:
                     plot_unordered_binned_cloud_envelopes(
                         sid,
                         set_id,
@@ -588,16 +577,6 @@ def main() -> None:
             except Exception as exc:
                 line(f"{sid} set {set_id}: cloud plot arrays failed: {exc}")
             else:
-                try:
-                    plot_unordered_nearest_proximity_map(
-                        sid,
-                        set_id,
-                        exp_plot_xy,
-                        num_plot_xy,
-                        out_dir=plots_dir_unordered,
-                    )
-                except Exception as exc:
-                    line(f"{sid} set {set_id}: nearest proximity plotting failed: {exc}")
                 try:
                     plot_unordered_binned_cloud_envelopes(
                         sid,

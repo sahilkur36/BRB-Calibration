@@ -11,7 +11,7 @@ Scatter optimal individual-calibration parameters vs specimen geometry.
   ``Linear fit (train)``). Y-limits use the same snapped range for a1 and a3 (and separately
   for b_p / b_n per cohort).
 
-Optimal set per specimen: minimum final_J_total over successful metrics rows in the
+Optimal set per specimen: minimum final_J_feat_raw (J_feat L2) over successful metrics rows in the
 requested set_id range, joined to optimized_brb_parameters.
 """
 
@@ -171,7 +171,7 @@ def _pick_optimal_parameter_rows(
     m = metrics[
         metrics["set_id"].isin(set_ids)
         & metrics["success"].astype(bool)
-        & np.isfinite(metrics["final_J_total"])
+        & np.isfinite(metrics["final_J_feat_raw"])
     ].copy()
     if m.empty:
         raise ValueError("No successful metrics rows in the given set range.")
@@ -186,7 +186,7 @@ def _pick_optimal_parameter_rows(
     for c in METRIC_PARAM_CHECK:
         merged = merged[np.isfinite(pd.to_numeric(merged[c], errors="coerce"))]
 
-    merged = merged.sort_values(["Name", "final_J_total"])
+    merged = merged.sort_values(["Name", "final_J_feat_raw"])
     best = merged.groupby("Name", as_index=False).first()
     return best
 

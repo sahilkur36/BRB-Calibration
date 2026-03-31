@@ -49,6 +49,12 @@ MIN_DEF_RANGE_ABS_IN = 0.001  # fallback when L_y is 0
 # Discard segment if its peak def is < this fraction of the previous same-kind peak (max_def/min_def)
 MIN_PEAK_FRAC = 0.75
 
+# Apparent-b amplitude weighting (for weighted_mean outputs).
+# Uses the same functional form as cycle amplitude weights:
+#   w = (A/Amax)^p + eps
+APPARENT_B_WEIGHT_POWER = 2.0
+APPARENT_B_WEIGHT_EPS = 0.05
+
 
 def _segments_zero_to_peak(points: list[dict]) -> list[tuple[int, int, str]]:
     """
@@ -163,11 +169,13 @@ def _segment_line_data(
     L_T: float,
     f_yc: float,
     L_y: float,
-) -> tuple[float, np.ndarray, np.ndarray, bool] | None:
+) -> tuple[float, np.ndarray, np.ndarray, bool, float] | None:
     """
     Same as _b_from_segment but also return (u_fit, F_fitted) for the fitted line
     from the first ``|F| >= 1.1 f_y A_sc`` index to peak.
-    Returns (b, u_fit, F_fitted, is_tension) or None. is_tension is True when mean force in plastic part >= 0.
+    Returns (b, u_fit, F_fitted, is_tension, amp) or None.
+    is_tension is True when mean force in plastic part >= 0.
+    amp is max(|u|) within the fitted hardening region (u_fit).
     """
     if end <= start + 1:
         return None
@@ -210,7 +218,8 @@ def _segment_line_data(
     F_fitted = ksh_plot * u_fit + c
     # Tension vs compression by sign of force (or intercept): positive -> tension (b_p), negative -> compression (b_n)
     is_tension = bool(np.mean(F_fit) >= 0.0)
-    return (b, u_fit, F_fitted, is_tension)
+    amp = float(np.max(np.abs(u_fit))) if len(u_fit) else float("nan")
+    return (b, u_fit, F_fitted, is_tension, amp)
 
 
 def _get_b_lists(
@@ -223,11 +232,18 @@ def _get_b_lists(
     L_T: float,
     L_y: float,
     fy: float,
-) -> tuple[list[float], list[float]]:
-    """Return (b_p_list, b_n_list). Skips segments with too small def range or peak < 75% of previous same-kind peak."""
+) -> tuple[list[float], list[float], list[float], list[float]]:
+    """
+    Return (b_p_list, b_n_list, amp_p_list, amp_n_list).
+
+    Skips segments with too small def range or peak < 75% of previous same-kind peak.
+    Amplitudes are max(|u|) over the fitted hardening region of each segment.
+    """
     segments = _segments_zero_to_peak(points)
     b_p_list: list[float] = []
     b_n_list: list[float] = []
+    amp_p_list: list[float] = []
+    amp_n_list: list[float] = []
     last_tension_peak: float | None = None
     last_compression_peak: float | None = None
     for start_idx, end_idx, _end_type in segments:
@@ -236,7 +252,7 @@ def _get_b_lists(
         result = _segment_line_data(u, F, start_idx, end_idx, E_hat, A_sc, L_T, fy, L_y)
         if result is None:
             continue
-        b, u_fit, _F_fitted, is_tension = result
+        b, u_fit, _F_fitted, is_tension, amp = result
         peak_def = float(u_fit[-1])
         keep, last_tension_peak, last_compression_peak = _segment_peak_ok(
             peak_def, is_tension, last_tension_peak, last_compression_peak
@@ -245,9 +261,11 @@ def _get_b_lists(
             continue
         if is_tension:
             b_p_list.append(b)
+            amp_p_list.append(amp)
         else:
             b_n_list.append(b)
-    return (b_p_list, b_n_list)
+            amp_n_list.append(amp)
+    return (b_p_list, b_n_list, amp_p_list, amp_n_list)
 
 
 def get_b_lists_one_specimen(specimen_id: str) -> tuple[list[float], list[float]]:
@@ -278,7 +296,7 @@ def get_b_lists_one_specimen(specimen_id: str) -> tuple[list[float], list[float]
         points, _ = loaded
     Q = compute_Q(L_T, L_y, A_sc, A_t)
     E_hat = Q * E_ksi
-    b_p_list, b_n_list = _get_b_lists(u, F, n, points, E_hat, A_sc, L_T, L_y, fy)
+    b_p_list, b_n_list, _amp_p, _amp_n = _get_b_lists(u, F, n, points, E_hat, A_sc, L_T, L_y, fy)
     return (b_n_list, b_p_list)
 
 
@@ -307,7 +325,9 @@ def extract_bn_bp_one_specimen(
     if n == 0:
         return {}
 
-    b_p_list, b_n_list = _get_b_lists(u, F, n, points, Q * E_ksi, A_sc, L_T, L_y, fy)
+    b_p_list, b_n_list, amp_p_list, amp_n_list = _get_b_lists(
+        u, F, n, points, Q * E_ksi, A_sc, L_T, L_y, fy
+    )
 
     def mean_or_nan(x: list[float]) -> float:
         """Mean of finite values or NaN."""
@@ -333,6 +353,26 @@ def extract_bn_bp_one_specimen(
         """Max of finite values or NaN."""
         return float(np.max(x)) if x else np.nan
 
+    def weighted_mean_or_nan(x: list[float], amps: list[float]) -> float:
+        """Amplitude-weighted mean (normalized by max amp) or NaN."""
+        if not x or not amps or len(x) != len(amps):
+            return float("nan")
+        b = np.asarray(x, dtype=float)
+        a = np.asarray(amps, dtype=float)
+        m = np.isfinite(b) & np.isfinite(a) & (a >= 0.0)
+        if not np.any(m):
+            return float("nan")
+        b = b[m]
+        a = a[m]
+        amax = float(np.max(a)) if a.size else float("nan")
+        if not np.isfinite(amax) or amax <= 0.0:
+            return float(np.mean(b)) if b.size else float("nan")
+        w = (a / amax) ** float(APPARENT_B_WEIGHT_POWER) + float(APPARENT_B_WEIGHT_EPS)
+        sw = float(np.sum(w))
+        if not np.isfinite(sw) or sw <= 0.0:
+            return float("nan")
+        return float(np.sum(w * b) / sw)
+
     L_y_sqrt_A_sc = L_y / (A_sc ** 0.5) if A_sc > 0 else np.nan
     fy_over_E = fy / E_ksi if E_ksi != 0 else np.nan
     fy_over_E_hat = fy / E_hat if E_hat != 0 else np.nan
@@ -349,12 +389,14 @@ def extract_bn_bp_one_specimen(
         "b_n_q3": q3_or_nan(b_n_list),
         "b_n_min": min_or_nan(b_n_list),
         "b_n_max": max_or_nan(b_n_list),
+        "b_n_weighted_mean": weighted_mean_or_nan(b_n_list, amp_n_list),
         "b_p_mean": mean_or_nan(b_p_list),
         "b_p_median": median_or_nan(b_p_list),
         "b_p_q1": q1_or_nan(b_p_list),
         "b_p_q3": q3_or_nan(b_p_list),
         "b_p_min": min_or_nan(b_p_list),
         "b_p_max": max_or_nan(b_p_list),
+        "b_p_weighted_mean": weighted_mean_or_nan(b_p_list, amp_p_list),
     }
 
 
@@ -398,12 +440,14 @@ def extract_bn_bp_unordered_row(sid: str, row: pd.Series) -> dict[str, float]:
         "b_n_q3": nan,
         "b_n_min": nan,
         "b_n_max": nan,
+        "b_n_weighted_mean": float(diag.b_n) if np.isfinite(diag.b_n) else nan,
         "b_p_mean": float(diag.b_p) if np.isfinite(diag.b_p) else nan,
         "b_p_median": nan,
         "b_p_q1": nan,
         "b_p_q3": nan,
         "b_p_min": nan,
         "b_p_max": nan,
+        "b_p_weighted_mean": float(diag.b_p) if np.isfinite(diag.b_p) else nan,
     }
 
 

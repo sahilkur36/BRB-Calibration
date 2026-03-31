@@ -188,6 +188,14 @@ function Invoke-Pipeline {
   Invoke-Py scripts/calibrate/optimize_brb_mse.py @script:AmplitudeWeightPyArgs --initial-params results/calibration/individual_optimize/initial_brb_parameters.csv --output results/calibration/individual_optimize/optimized_brb_parameters.csv
   Invoke-Py scripts/calibrate/plot_params_vs_filtered.py --params results/calibration/individual_optimize/optimized_brb_parameters.csv --output-dir overlays
 
+  # --- Individual optimal parameters vs geometry ---
+  # Uses optimized_brb_parameters_metrics.csv to pick best set per specimen (min final_J_feat_raw) and plots vs geometry.
+  Invoke-Py scripts/calibrate/plot_individual_optimal_params_vs_geometry.py
+
+  # --- Correlations: optimal params vs geometry (train cohort) ---
+  # Uses the same "optimal" selection as the geometry plots (min final_J_feat_raw).
+  Invoke-Py scripts/calibrate/report_param_geometry_correlations.py
+
   # --- Averaged-parameter evaluation ---
   Invoke-Py scripts/calibrate/eval_averaged_params.py @script:AmplitudeWeightPyArgs --params results/calibration/individual_optimize/optimized_brb_parameters.csv --output-params results/calibration/averaged_optimize/averaged_brb_parameters.csv --output-metrics results/calibration/averaged_optimize/averaged_params_eval_metrics.csv --output-plots-dir results/plots/calibration/averaged_optimize/overlays
 

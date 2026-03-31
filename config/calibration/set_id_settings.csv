@@ -3,7 +3,7 @@
 #
 # Steel seed columns:
 # - E,R0,cR1,cR2,a1,a2,a3,a4 are optional overrides (blank -> defaults in build_initial_brb_parameters.py).
-# - b_p,b_n are numeric literals or one of: median,mean,q1,q3,min,max (blank -> median).
+# - b_p,b_n are numeric literals or one of: median,mean,weighted_mean,q1,q3,min,max (blank -> median).
 #
 # optimize_params:
 # - comma-separated segments; flexible spelling; see scripts/calibrate/set_id_optimize_params.py parser.
@@ -11,11 +11,10 @@
 # Loss settings columns:
 # - leave blank to use DEFAULT_CALIBRATION_LOSS_SETTINGS (scripts/calibrate/calibration_loss_settings.py).
 set_id,E,R0,cR1,cR2,a1,a2,a3,a4,b_p,b_n,optimize_params,w_feat_l2,w_feat_l1,w_energy_l2,w_energy_l1,w_unordered_binenv_l2,w_unordered_binenv_l1,use_amplitude_weights,amplitude_weight_power,amplitude_weight_eps
-1,29000,20,0.8875,0.15,0.04,1,0.04,1,median,median,"cR1,cR2,a1,a3",1,0,0,0,0,0,true,2.0,0.05
-2,29000,20,0.8875,0.15,0.04,1,0.04,1,q1,q1,"cR1,cR2,a1,a3",1,0,0,0,0,0,true,2.0,0.05
-3,29000,20,0.8875,0.15,0.04,1,0.04,1,median,median,"cR1,cR2,a1,a3",1,0,4,0,0,0,true,2.0,0.05
-4,29000,20,0.8875,0.15,0.04,1,0.04,1,q1,q1,"cR1,cR2,a1,a3",1,0,4,0,0,0,true,2.0,0.05
-5,29000,20,0.8875,0.15,0.04,1,0.04,1,median,median,"cR1,cR2,a1,a3",1,0,10,0,0,0,false,0.0,0.05
-6,29000,20,0.8875,0.15,0.04,1,0.04,1,q1,q1,"cR1,cR2,a1,a3",1,0,10,0,0,0,false,0.0,0.05
-7,29000,20,0.8875,0.15,0.04,1,0.04,1,median,median,"cR1,cR2,a1,a3",1,0,0,1,0,0,false,0.0,0.05
-8,29000,20,0.8875,0.15,0.04,1,0.04,1,q1,q1,"cR1,cR2,a1,a3",1,0,0,1,0,0,false,0.0,0.05
+1,29000,20,0.8875,0.15,0.04,1,0.04,1,median,median,"cR1,cR2,a1,a3",1,0,0,0,0,0,TRUE,2,0.05
+2,29000,20,0.8875,0.15,0.04,1,0.04,1,q1,q1,"cR1,cR2,a1,a3",1,0,0,0,0,0,TRUE,2,0.05
+3,29000,20,0.8875,0.15,0.04,1,0.04,1,weighted_mean,weighted_mean,"cR1,cR2,a1,a3",1,0,0,0,0,0,TRUE,2,0.05
+4,29000,20,0.8875,0.15,0.04,1,0.04,1,median,median,"cR1,cR2,a1,a3",0,1,0,0,0,0,TRUE,2,0.05
+5,29000,20,0.8875,0.15,0.04,1,0.04,1,q1,q1,"cR1,cR2,a1,a3",0,1,0,0,0,0,TRUE,2,0.05
+6,29000,20,0.8875,0.15,0.04,1,0.04,1,weighted_mean,weighted_mean,"cR1,cR2,a1,a3",0,1,0,0,0,0,TRUE,2,0.05
+

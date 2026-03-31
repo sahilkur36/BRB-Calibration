@@ -12,15 +12,15 @@ With ``--write report.md``, also writes CSV summaries next to the Markdown:
 **By set_id (one row per set):** ``{stem}_generalized_by_set.csv`` (shared parameters + specimen-weighted eval
 columns matching the Markdown generalized table), ``{stem}_individual_by_set.csv`` (mean optimized parameters per set).
 The individual CSV also includes ``mean_optima``: for each specimen, the optimized
-parameters from the ``set_id`` with lowest ``final_J_total`` (from the companion
+parameters from the ``set_id`` with lowest ``final_J_feat_raw`` (from the companion
 ``*_metrics.csv``), then the mean of those values across specimens.
 It also includes ``mean_optima_weighted``: the same per-specimen vectors weighted by
-``1 / (final_J_total + eps)`` at that best set (better fits count more); default ``eps``
+``1 / (final_J_feat_raw + eps)`` at that best set (better fits count more); default ``eps``
 is set via ``--weighted-optima-eps``.
 
 The generalized CSV adds ``optimum_value``: for each **shared** optimized parameter, its value on the **generalized**
 vector at the specimen-set-optimal ``set_id`` (among selected sets: minimum
-specimen-weighted mean ``final_J_total`` over **contributing** rows, same rule as
+specimen-weighted mean ``final_J_feat_raw`` over **contributing** rows, same rule as
 ``report_averaged_vs_generalized_metrics``). ``b_p`` and ``b_n`` are omitted (blank) because they are not
 merged into a single value per ``set_id`` with the default optimized subset (unless ``b_p`` / ``b_n`` are included there via ``set_id_settings.csv``). Requires ``generalized_params_eval_metrics.csv``
 (or ``--generalized-metrics``).
@@ -173,16 +173,16 @@ def _individual_best_row_per_specimen_by_cost(
 ) -> tuple[pd.DataFrame, np.ndarray]:
     """
     One row per specimen (Name): parameters from the set_id in ``set_ids`` with
-    minimum ``final_J_total``, among rows with finite optimized parameters and finite cost.
+    minimum ``final_J_feat_raw``, among rows with finite optimized parameters and finite cost.
 
-    Returns the parameters table and ``j_best``, aligned row-wise: ``final_J_total`` at
+    Returns the parameters table and ``j_best``, aligned row-wise: ``final_J_feat_raw`` at
     that best (Name, set_id) for each specimen.
     """
     if "Name" not in df.columns:
         raise SystemExit("individual CSV: missing Name column")
     if "set_id" not in df.columns:
         raise SystemExit("individual CSV: missing set_id column")
-    for col in ("Name", "set_id", "final_J_total"):
+    for col in ("Name", "set_id", "final_J_feat_raw"):
         if col not in metrics.columns:
             raise SystemExit(f"individual metrics CSV: missing {col!r} column")
     sid = pd.to_numeric(df["set_id"], errors="coerce").astype("Int64")
@@ -196,15 +196,15 @@ def _individual_best_row_per_specimen_by_cost(
     d_opt = d.loc[ok]
     if d_opt.empty:
         raise SystemExit("individual CSV: no rows with all optimized parameters finite")
-    m = metrics[["Name", "set_id", "final_J_total"]].copy()
+    m = metrics[["Name", "set_id", "final_J_feat_raw"]].copy()
     m["set_id"] = pd.to_numeric(m["set_id"], errors="coerce").astype("Int64")
     merged = d_opt.merge(m, on=["Name", "set_id"], how="left")
-    cost = pd.to_numeric(merged["final_J_total"], errors="coerce")
+    cost = pd.to_numeric(merged["final_J_feat_raw"], errors="coerce")
     merged = merged.assign(_cost=cost)
     merged = merged[np.isfinite(merged["_cost"])]
     if merged.empty:
         raise SystemExit(
-            "individual + metrics: no rows with finite final_J_total after merge"
+            "individual + metrics: no rows with finite final_J_feat_raw after merge"
         )
     best_idx: list[object] = []
     for _, g in merged.groupby("Name", sort=False):
@@ -223,7 +223,7 @@ def _as_bool_series(s: pd.Series) -> pd.Series:
 
 def _contributing_mask(metrics_df: pd.DataFrame) -> pd.Series:
     """Same as ``report_averaged_vs_generalized_metrics._contributing_mask`` (no OpenSees import)."""
-    jt = pd.to_numeric(metrics_df["final_J_total"], errors="coerce")
+    jt = pd.to_numeric(metrics_df["final_J_feat_raw"], errors="coerce")
     return (
         _as_bool_series(metrics_df["contributes_to_aggregate"])
         & _as_bool_series(metrics_df["success"])
@@ -259,10 +259,10 @@ def _aggregate_by_set_metrics(
 
 def _best_overall_set_id_from_agg(agg: pd.DataFrame) -> tuple[int | None, float]:
     """Best set_id and cost from one-row-per-set aggregate."""
-    if agg.empty or "final_J_total" not in agg.columns:
+    if agg.empty or "final_J_feat_raw" not in agg.columns:
         return None, float("nan")
-    i = agg["final_J_total"].idxmin()
-    return int(agg.loc[i, "set_id"]), float(agg.loc[i, "final_J_total"])
+    i = agg["final_J_feat_raw"].idxmin()
+    return int(agg.loc[i, "set_id"]), float(agg.loc[i, "final_J_feat_raw"])
 
 
 def _generalized_agg_metrics_for_selected_sets(
@@ -413,9 +413,9 @@ def build_report(
     if best_id is not None and np.isfinite(best_j):
         lines.append(
             f"**Best generalized set** among the selected ``set_id`` values (lowest specimen-weighted mean "
-            f"``final_J_total`` over contributing rows—``contributes_to_aggregate``, ``success``, finite cost, "
+            f"``final_J_feat_raw`` over contributing rows—``contributes_to_aggregate``, ``success``, finite cost, "
             f"same rule as ``report_averaged_vs_generalized_metrics``): **`set_id` = {best_id}** "
-            f"(mean ``J_total`` = {_fmt(float(best_j))}). "
+            f"(mean ``J_feat`` = {_fmt(float(best_j))}). "
             "The **optimum_value** column in the summary table below uses that shared parameter vector."
         )
     else:
@@ -495,8 +495,8 @@ def build_report(
             "",
             "(Statistics apply to the **per-set means** in the table above, not raw per-specimen rows.)",
             "**mean_optima** is the unweighted mean of each parameter over specimens at that specimen's best "
-            "`set_id` (minimum `final_J_total`). **mean_optima_weighted** uses weights "
-            f"`1/(final_J_total + eps)` at that best set with `eps` = {weighted_optima_eps:g} "
+            "`set_id` (minimum `final_J_feat_raw`). **mean_optima_weighted** uses weights "
+            f"`1/(final_J_feat_raw + eps)` at that best set with `eps` = {weighted_optima_eps:g} "
             "(override with `--weighted-optima-eps`).",
             "",
         ]
@@ -555,7 +555,7 @@ def main() -> None:
         type=Path,
         default=None,
         help=(
-            "optimized_brb_parameters_metrics.csv (final_J_total per Name/set_id). "
+            "optimized_brb_parameters_metrics.csv (final_J_feat_raw per Name/set_id). "
             "Default: same directory as --individual-params, stem + '_metrics.csv'."
         ),
     )
@@ -599,7 +599,7 @@ def main() -> None:
         metavar="EPS",
         help=(
             "Small positive constant for individual mean_optima_weighted: weights are "
-            "1/(max(final_J_total,0)+eps) per specimen at that specimen's best set. Default: 1e-9."
+            "1/(max(final_J_feat_raw,0)+eps) per specimen at that specimen's best set. Default: 1e-9."
         ),
     )
     _w_rel = CALIBRATION_PARAMETER_SUMMARY_MD
@@ -669,7 +669,7 @@ def main() -> None:
             f"**Rollup** (one row per parameter, mean/min/max across sets): `{generalized_csv.name}`, "
             f"`{indiv_csv.name}`. Generalized adds **`optimum_value`** (shared optimized parameters at the "
             f"specimen-set best `set_id`; `b_p` / `b_n` blank); individual adds **`mean_optima`** and "
-            f"**`mean_optima_weighted`** (inverse-loss–weighted mean using `1/(final_J_total+eps)` at each "
+            f"**`mean_optima_weighted`** (inverse-loss–weighted mean using `1/(final_J_feat_raw+eps)` at each "
             f"specimen's best set; default eps = {float(args.weighted_optima_eps):g}).\n\n"
             f"**By `set_id`** (wide tables, same numeric content as the Markdown set tables): "
             f"`{generalized_by_set_csv.name}` (parameters + specimen-weighted eval columns), "

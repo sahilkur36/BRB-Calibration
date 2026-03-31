@@ -4,10 +4,10 @@ scatter plots of resampled segment statistics vs geometry (fifth panel: ``Q = \\
 include ``Q`` from ``extract_bn_bp``).
 
 **B vs geometry** (``results/plots/apparent_b/b_vs_geometry/``): **ordered** and **all** (resampled +
-envelope) are written **three times**—once per segment statistic only (**mean**, **median**, **Q1**).
-**Digitized envelope** scatter uses a single $b$ per specimen (no segment mean/median/Q1), so only
-``bn_vs_geometry_scatter.png`` and ``bp_vs_geometry_scatter.png`` (cohort mean + median baselines on
-those figures). **All** files: ``bn_vs_geometry_all_{mean,median,q1}.png`` (and ``bp_vs_geometry_*``).
+envelope) are written for each segment statistic (**mean**, **median**, **weighted_mean**, **Q1**).
+**Digitized envelope** scatter uses a single $b$ per specimen (no segment mean/median/weighted_mean/Q1),
+so only ``bn_vs_geometry_scatter.png`` and ``bp_vs_geometry_scatter.png`` (cohort mean + median baselines on
+those figures). **All** files: ``bn_vs_geometry_all_{mean,median,weighted_mean,q1}.png`` (and ``bp_vs_geometry_*``).
 Box plots: ``box_bn_vs_geometry.png`` / ``box_bp_vs_geometry.png``.
 """
 from __future__ import annotations
@@ -63,8 +63,8 @@ B_VS_GEOMETRY_DIR = _APPARENT / "b_vs_geometry"
 # Outside legends: fewer columns so the figure does not need excessive width (specimen names wrap to more rows).
 B_VS_GEOMETRY_LEGEND_NCOL = 7
 
-SegmentStatLit = Literal["mean", "median", "q1"]
-SEGMENT_STATS_ORDER: tuple[SegmentStatLit, ...] = ("mean", "median", "q1")
+SegmentStatLit = Literal["mean", "median", "weighted_mean", "q1"]
+SEGMENT_STATS_ORDER: tuple[SegmentStatLit, ...] = ("mean", "median", "weighted_mean", "q1")
 
 DEF_COL = "Deformation[in]"
 FORCE_COL = "Force[kip]"
@@ -76,7 +76,7 @@ def _cohort_ref_value(y: np.ndarray, stat: SegmentStatLit) -> float:
     arr = arr[np.isfinite(arr)]
     if arr.size == 0:
         return float("nan")
-    if stat == "mean":
+    if stat in ("mean", "weighted_mean"):
         return float(np.mean(arr))
     if stat == "median":
         return float(np.median(arr))
@@ -84,11 +84,16 @@ def _cohort_ref_value(y: np.ndarray, stat: SegmentStatLit) -> float:
 
 
 def _stat_label_word(stat: SegmentStatLit) -> str:
-    return {"mean": "Mean", "median": "Median", "q1": "Q1"}[stat]
+    return {"mean": "Mean", "median": "Median", "weighted_mean": "Weighted mean", "q1": "Q1"}[stat]
 
 
 def _cohort_legend_label(stat: SegmentStatLit) -> str:
-    return {"mean": "Cohort mean", "median": "Cohort median", "q1": "Cohort Q1"}[stat]
+    return {
+        "mean": "Cohort mean",
+        "median": "Cohort median",
+        "weighted_mean": "Cohort weighted mean",
+        "q1": "Cohort Q1",
+    }[stat]
 
 
 def _format_x_3sig(x, pos):
@@ -430,7 +435,7 @@ def plot_scatter_bn_bp(
 def plot_scatter_bn_bp_digitized(df: pd.DataFrame, out_dir: Path) -> None:
     """
     Same geometry panels as ``plot_scatter_bn_bp``, but one **envelope** $b$ per specimen
-    (``b_n_envelope``, ``b_p_envelope`` from the digitized cloud)—no separate mean/median/Q1 series.
+    (``b_n_envelope``, ``b_p_envelope`` from the digitized cloud)—no separate mean/median/weighted_mean/Q1 series.
     Writes ``bn_vs_geometry_scatter.png`` and ``bp_vs_geometry_scatter.png`` only. Cohort mean and
     median of envelope $b$ in each panel (two baselines, same plotted quantity).
     """
