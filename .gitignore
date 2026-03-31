@@ -47,6 +47,7 @@ summary_statistics/
 # config/test eval outputs (run_eval_params_metrics.py, etc.)
 config/test/overlays/
 config/test/simulated_force/
+config/test/params_eval_metrics.csv
 
 # Full pipeline zip snapshots (archive_pipeline_outputs.ps1 / .sh)
 run_snapshots/
