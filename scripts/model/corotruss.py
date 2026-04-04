@@ -96,17 +96,19 @@ def run_simulation(
 
     ops.element("corotTruss", 1, 1, 2, A_sc, 1)
 
-    # Path: apply displacement; use [0, disp[0], disp[1], ...] so step i gives disp[i]
-    values = [0.0] + displacement.tolist()
-    time = np.linspace(0.0, n, n + 1).tolist()
+    # Path series: uniform dt=1 => times 0..n; length n+1 with zero initial disp.
+    # -useLast avoids load factor 0 when pseudo-time rounds past the final sample.
     dt = 1.0
-    ops.timeSeries("Path", 1, "-time", *time, "-values", *values)
+    path_values = np.empty(n + 1, dtype=np.float64)
+    path_values[0] = 0.0
+    path_values[1:] = displacement
+    ops.timeSeries("Path", 1, "-dt", dt, "-values", *path_values, "-useLast")
     ops.pattern("Plain", 1, 1)
     ops.sp(2, 1, 1.0)
 
     ops.integrator("LoadControl", dt)
     ops.constraints("Transformation")
-    ops.numberer("RCM")
+    ops.numberer("Plain")
     ops.system("UmfPack")
     ops.analysis("Static", "-noWarnings")
 

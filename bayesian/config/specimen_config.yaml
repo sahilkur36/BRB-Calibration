@@ -1,0 +1,23 @@
+# CB225 — standalone bayesian bundle (values from BRB-Specimens / model settings)
+
+specimen_id: CB225
+fy_ksi: 38.6
+A_sc_in2: 2.25
+A_t_in2: 5.625
+L_T_in: 250.0
+L_y_in: 175.0
+E_ksi: 29000.0
+
+use_amplitude_weights: true
+amplitude_weight_power: 2.0
+amplitude_weight_eps: 0.05
+
+# Paths are relative to this file's directory (config/).
+paths:
+  force_deformation: ../data/force_deformation.csv
+  cycle_points: ../data/CB225_cycle_points.json
+  cycle_meta: cycle_meta.json
+  # Single-row CSVs for model.py / precompute (written by scripts/setup_cycle_targets.py); live in bayesian root.
+  target_displacement: ../target_displacement.csv
+  target_force: ../target_force.csv
+  landmark_cache: ../data/landmark_cache.json

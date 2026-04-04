@@ -1,0 +1,281 @@
+{
+  "points": [
+    {
+      "idx": 0,
+      "type": "zero_def",
+      "force_kip": 1.227259466,
+      "deformation_in": -0.033994334
+    },
+    {
+      "idx": 16,
+      "type": "zero_force",
+      "force_kip": 1.355255852,
+      "deformation_in": 0.543909348
+    },
+    {
+      "idx": 24,
+      "type": "zero_def",
+      "force_kip": -73.19510979,
+      "deformation_in": -0.050991501
+    },
+    {
+      "idx": 35,
+      "type": "min_def",
+      "force_kip": -99.28943183,
+      "deformation_in": -0.866855524
+    },
+    {
+      "idx": 39,
+      "type": "zero_force",
+      "force_kip": -2.887447884,
+      "deformation_in": -0.611898017
+    },
+    {
+      "idx": 48,
+      "type": "zero_def",
+      "force_kip": 82.96612802,
+      "deformation_in": 0.016997167
+    },
+    {
+      "idx": 69,
+      "type": "max_def",
+      "force_kip": 99.27437343,
+      "deformation_in": 1.648725212
+    },
+    {
+      "idx": 74,
+      "type": "zero_force",
+      "force_kip": 0.856446406,
+      "deformation_in": 1.291784703
+    },
+    {
+      "idx": 91,
+      "type": "zero_def",
+      "force_kip": -89.12313064,
+      "deformation_in": 0.033994334
+    },
+    {
+      "idx": 113,
+      "type": "min_def",
+      "force_kip": -102.1204107,
+      "deformation_in": -1.648725212
+    },
+    {
+      "idx": 117,
+      "type": "zero_force",
+      "force_kip": -0.395282957,
+      "deformation_in": -1.359773371
+    },
+    {
+      "idx": 135,
+      "type": "zero_def",
+      "force_kip": 95.59447733,
+      "deformation_in": 0.033994334
+    },
+    {
+      "idx": 167,
+      "type": "max_def",
+      "force_kip": 94.80391142000029,
+      "deformation_in": 2.4645892349999996
+    },
+    {
+      "idx": 171,
+      "type": "zero_force",
+      "force_kip": 5.699603776,
+      "deformation_in": 2.158640227
+    },
+    {
+      "idx": 198,
+      "type": "zero_def",
+      "force_kip": -99.08237885,
+      "deformation_in": 0.067988669
+    },
+    {
+      "idx": 231,
+      "type": "min_def",
+      "force_kip": -126.2176127,
+      "deformation_in": -2.4475920679999996
+    },
+    {
+      "idx": 236,
+      "type": "zero_force",
+      "force_kip": 0.767978316,
+      "deformation_in": -2.107648725
+    },
+    {
+      "idx": 261,
+      "type": "zero_def",
+      "force_kip": 99.5322485,
+      "deformation_in": -0.186968839
+    },
+    {
+      "idx": 309,
+      "type": "max_def",
+      "force_kip": 121.6191543,
+      "deformation_in": 3.535410765
+    },
+    {
+      "idx": 315,
+      "type": "zero_force",
+      "force_kip": -8.703754247,
+      "deformation_in": 3.127478754
+    },
+    {
+      "idx": 356,
+      "type": "zero_def",
+      "force_kip": -109.0717439,
+      "deformation_in": -0.033994334
+    },
+    {
+      "idx": 401,
+      "type": "min_def",
+      "force_kip": -140.4120354,
+      "deformation_in": -3.535410765
+    },
+    {
+      "idx": 407,
+      "type": "zero_force",
+      "force_kip": 0.538337741,
+      "deformation_in": -3.144475921
+    },
+    {
+      "idx": 445,
+      "type": "zero_def",
+      "force_kip": 108.8270449,
+      "deformation_in": -0.220963173
+    },
+    {
+      "idx": 507,
+      "type": "max_def",
+      "force_kip": 115.2042766,
+      "deformation_in": 4.57223796
+    },
+    {
+      "idx": 512,
+      "type": "zero_force",
+      "force_kip": 0.831976509,
+      "deformation_in": 4.181303116
+    },
+    {
+      "idx": 568,
+      "type": "zero_def",
+      "force_kip": -118.4041862,
+      "deformation_in": -0.169971671
+    },
+    {
+      "idx": 624,
+      "type": "min_def",
+      "force_kip": -156.5772261,
+      "deformation_in": -4.521246459
+    },
+    {
+      "idx": 630,
+      "type": "zero_force",
+      "force_kip": 4.310466528,
+      "deformation_in": -4.113314448
+    },
+    {
+      "idx": 686,
+      "type": "zero_def",
+      "force_kip": 118.2234855,
+      "deformation_in": 0.203966006
+    },
+    {
+      "idx": 756,
+      "type": "max_def",
+      "force_kip": 131.380761,
+      "deformation_in": 5.609065156
+    },
+    {
+      "idx": 762,
+      "type": "zero_force",
+      "force_kip": 2.386756139,
+      "deformation_in": 5.201133144
+    },
+    {
+      "idx": 830,
+      "type": "zero_def",
+      "force_kip": -132.3313224,
+      "deformation_in": -0.050991501
+    },
+    {
+      "idx": 901,
+      "type": "min_def",
+      "force_kip": -163.4551495,
+      "deformation_in": -5.575070822
+    },
+    {
+      "idx": 907,
+      "type": "zero_force",
+      "force_kip": -5.225264228,
+      "deformation_in": -5.16713881
+    },
+    {
+      "idx": 971,
+      "type": "zero_def",
+      "force_kip": 121.447865,
+      "deformation_in": -0.23796034
+    },
+    {
+      "idx": 1020,
+      "type": "max_def",
+      "force_kip": 112.3168287,
+      "deformation_in": 3.535410765
+    },
+    {
+      "idx": 1025,
+      "type": "zero_force",
+      "force_kip": 0.602335934,
+      "deformation_in": 3.144475921
+    },
+    {
+      "idx": 1067,
+      "type": "zero_def",
+      "force_kip": -122.364545,
+      "deformation_in": -0.050991501
+    },
+    {
+      "idx": 1125,
+      "type": "min_def",
+      "force_kip": -163.2217443,
+      "deformation_in": -4.521246459
+    },
+    {
+      "idx": 1130,
+      "type": "zero_force",
+      "force_kip": -6.335821106,
+      "deformation_in": -4.181303116
+    },
+    {
+      "idx": 1182,
+      "type": "zero_def",
+      "force_kip": 114.1577179,
+      "deformation_in": -0.152974504
+    },
+    {
+      "idx": 1230,
+      "type": "max_def",
+      "force_kip": 101.6893641,
+      "deformation_in": 3.552407932
+    },
+    {
+      "idx": 1235,
+      "type": "zero_force",
+      "force_kip": 1.942533387,
+      "deformation_in": 3.195467422
+    },
+    {
+      "idx": 1274,
+      "type": "zero_def",
+      "force_kip": -123.6445089,
+      "deformation_in": 0.169971671
+    },
+    {
+      "idx": 1322,
+      "type": "min_def",
+      "force_kip": -152.3721683,
+      "deformation_in": -3.535410765
+    }
+  ],
+  "n": 1328
+}

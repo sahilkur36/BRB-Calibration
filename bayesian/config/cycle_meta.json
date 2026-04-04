@@ -1,0 +1,75 @@
+{
+  "specimen_id": "CB225",
+  "n": 1328,
+  "s_d": 11.184135978,
+  "s_f": 312.66989691073013,
+  "use_amplitude_weights": true,
+  "amplitude_weight_power": 2.0,
+  "amplitude_weight_eps": 0.05,
+  "meta": [
+    {
+      "start": 0,
+      "end": 48,
+      "kind": "full_cycle",
+      "incomplete": false,
+      "amp": 0.866855524,
+      "w_c": 0.07388429751464964
+    },
+    {
+      "start": 48,
+      "end": 135,
+      "kind": "full_cycle",
+      "incomplete": false,
+      "amp": 1.648725212,
+      "w_c": 0.13640036725483068
+    },
+    {
+      "start": 135,
+      "end": 261,
+      "kind": "full_cycle",
+      "incomplete": false,
+      "amp": 2.464589235,
+      "w_c": 0.2430670339428913
+    },
+    {
+      "start": 261,
+      "end": 445,
+      "kind": "full_cycle",
+      "incomplete": false,
+      "amp": 3.535410765,
+      "w_c": 0.44728191001054485
+    },
+    {
+      "start": 445,
+      "end": 686,
+      "kind": "full_cycle",
+      "incomplete": false,
+      "amp": 4.57223796,
+      "w_c": 0.7144719925093641
+    },
+    {
+      "start": 686,
+      "end": 971,
+      "kind": "full_cycle",
+      "incomplete": false,
+      "amp": 5.609065156,
+      "w_c": 1.05
+    },
+    {
+      "start": 971,
+      "end": 1182,
+      "kind": "full_cycle",
+      "incomplete": false,
+      "amp": 4.521246459,
+      "w_c": 0.699733700620147
+    },
+    {
+      "start": 1182,
+      "end": 1328,
+      "kind": "incomplete_tail",
+      "incomplete": true,
+      "amp": 3.552407932,
+      "w_c": 0.45111111108100116
+    }
+  ]
+}

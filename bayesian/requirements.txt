@@ -1,0 +1,6 @@
+# Minimum versions aligned with PyPI current releases (Apr 2026). Pin with == in CI if you need exact reproducibility.
+numpy>=2.4.4
+pandas>=3.0.2
+PyYAML>=6.0.3
+matplotlib>=3.10.8
+openseespy>=3.8.0.0
